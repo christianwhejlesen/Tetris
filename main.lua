@@ -11,7 +11,7 @@ function love.load()
 
 end
 
-function love.update()
+function love.update( dt )
 
 end
 
