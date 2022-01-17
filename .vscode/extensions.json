@@ -1,6 +1,5 @@
 {
     "recommendations": [
-        "sumneko.lua",
-        "lwz7512.love2d-made-easy"
+        "pixelbyte-studios.pixelbyte-love2d"
     ]
 }

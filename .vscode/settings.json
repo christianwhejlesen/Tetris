@@ -1,3 +1,6 @@
 {
-    "scm-buttons.showGitCommitAll": true
+    "scm-buttons.showGitCommitAll": true,
+    "Lua.diagnostics.globals": [
+        "love"
+    ]
 }
