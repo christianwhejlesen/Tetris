@@ -2,23 +2,195 @@
 
 Tile = {}
 --PRIVATE:
-    local colors = {
-        [' '] = {222/255, 222/255, 222/255, 100/100}, --SAME AS BOARD BGCOLOR
-        i = {120/255, 194/255, 240/255, 100/100},
-        j = {237/255, 232/255, 107/255, 100/100},
-        l = {125/255, 217/255, 194/255, 100/100},
-        o = {235/255, 176/255, 120/255, 100/100},
-        s = {212/255, 138/255, 237/255, 100/100},
-        t = {247/255, 148/255, 196/255, 100/100},
-        z = {168/255, 212/255, 117/255, 100/100},
-    }
-
-    local function getColors()
-        local c ={
-            [' '] = colors
-        }
-    end
+local tileset;
+local sequence = {};
+local function drawBlock(block, x, y, board)
+    local brd = board.getVars();
+    local color = brd.colors[block]
+    love.graphics.setColor(color)
+    love.graphics.rectangle('fill', ((x - 1) * brd.blockSize) + brd.offsetX, ((y - 1) * brd.blockSize) + brd.offsetY, brd.blockDrawSize, brd.blockDrawSize, brd.rounding, brd.rounding);
+end
 
 --PUBLIC:
+    function Tile.init()
+        tileset = {
+            {
+                {
+                    {' ', ' ', ' ', ' '},
+                    {'i', 'i', 'i', 'i'},
+                    {' ', ' ', ' ', ' '},
+                    {' ', ' ', ' ', ' '},
+                },
+                {
+                    {' ', 'i', ' ', ' '},
+                    {' ', 'i', ' ', ' '},
+                    {' ', 'i', ' ', ' '},
+                    {' ', 'i', ' ', ' '},
+                },
+            },
+            {
+                {
+                    {' ', ' ', ' ', ' '},
+                    {' ', 'o', 'o', ' '},
+                    {' ', 'o', 'o', ' '},
+                    {' ', ' ', ' ', ' '},
+                },
+            },
+            {
+                {
+                    {' ', ' ', ' ', ' '},
+                    {'j', 'j', 'j', ' '},
+                    {' ', ' ', 'j', ' '},
+                    {' ', ' ', ' ', ' '},
+                },
+                {
+                    {' ', 'j', ' ', ' '},
+                    {' ', 'j', ' ', ' '},
+                    {'j', 'j', ' ', ' '},
+                    {' ', ' ', ' ', ' '},
+                },
+                {
+                    {'j', ' ', ' ', ' '},
+                    {'j', 'j', 'j', ' '},
+                    {' ', ' ', ' ', ' '},
+                    {' ', ' ', ' ', ' '},
+                },
+                {
+                    {' ', 'j', 'j', ' '},
+                    {' ', 'j', ' ', ' '},
+                    {' ', 'j', ' ', ' '},
+                    {' ', ' ', ' ', ' '},
+                },
+            },
+            {
+                {
+                    {' ', ' ', ' ', ' '},
+                    {'l', 'l', 'l', ' '},
+                    {'l', ' ', ' ', ' '},
+                    {' ', ' ', ' ', ' '},
+                },
+                {
+                    {' ', 'l', ' ', ' '},
+                    {' ', 'l', ' ', ' '},
+                    {' ', 'l', 'l', ' '},
+                    {' ', ' ', ' ', ' '},
+                },
+                {
+                    {' ', ' ', 'l', ' '},
+                    {'l', 'l', 'l', ' '},
+                    {' ', ' ', ' ', ' '},
+                    {' ', ' ', ' ', ' '},
+                },
+                {
+                    {'l', 'l', ' ', ' '},
+                    {' ', 'l', ' ', ' '},
+                    {' ', 'l', ' ', ' '},
+                    {' ', ' ', ' ', ' '},
+                },
+            },
+            {
+                {
+                    {' ', ' ', ' ', ' '},
+                    {'t', 't', 't', ' '},
+                    {' ', 't', ' ', ' '},
+                    {' ', ' ', ' ', ' '},
+                },
+                {
+                    {' ', 't', ' ', ' '},
+                    {' ', 't', 't', ' '},
+                    {' ', 't', ' ', ' '},
+                    {' ', ' ', ' ', ' '},
+                },
+                {
+                    {' ', 't', ' ', ' '},
+                    {'t', 't', 't', ' '},
+                    {' ', ' ', ' ', ' '},
+                    {' ', ' ', ' ', ' '},
+                },
+                {
+                    {' ', 't', ' ', ' '},
+                    {'t', 't', ' ', ' '},
+                    {' ', 't', ' ', ' '},
+                    {' ', ' ', ' ', ' '},
+                },
+            },
+            {
+                {
+                    {' ', ' ', ' ', ' '},
+                    {' ', 's', 's', ' '},
+                    {'s', 's', ' ', ' '},
+                    {' ', ' ', ' ', ' '},
+                },
+                {
+                    {'s', ' ', ' ', ' '},
+                    {'s', 's', ' ', ' '},
+                    {' ', 's', ' ', ' '},
+                    {' ', ' ', ' ', ' '},
+                },
+            },
+            {
+                {
+                    {' ', ' ', ' ', ' '},
+                    {'z', 'z', ' ', ' '},
+                    {' ', 'z', 'z', ' '},
+                    {' ', ' ', ' ', ' '},
+                },
+                {
+                    {' ', 'z', ' ', ' '},
+                    {'z', 'z', ' ', ' '},
+                    {'z', ' ', ' ', ' '},
+                    {' ', ' ', ' ', ' '},
+                },
+            },
+        }
+        return tileset;
+    end
+
+    function Tile.drawTile(piece, rotation, posX, posY, board)
+        for y = 1, 4 do
+            for x = 1, 4 do
+                local block = tileset[piece][rotation][y][x]
+                if block ~= ' ' then
+                    drawBlock(block, x + posX, y + posY, board);
+                end
+            end
+        end
+    end
+
+    function Tile.canTileMove(piece, rotation, testX, testY, board)
+        local brd = board.getVars();
+        for y = 1, 4 do
+            for x = 1, 4 do
+                local xBlock = testX + x;
+                local yBlock = testY + y;
+                if tileset[piece][rotation][y][x] ~= ' ' and (xBlock < 1 or xBlock > brd.width or yBlock > brd.height or brd.field[yBlock][xBlock] ~= ' ') then
+                    return false
+                end
+            end
+        end
+
+        return true
+
+    end
+
+    local function newSequence()
+        for pieceTypeIndex = 1, #tileset do
+            local position = math.random(#sequence +1);
+            table.insert(sequence, position, pieceTypeIndex);
+        end
+    end
+        
+    function Tile.newPiece()
+        if #sequence == 0 then
+            newSequence();
+        end
+        local piece ={
+            x = 3,
+            y = 0;
+            type = table.remove(sequence),
+            rotation = 1
+        };
+        return piece;
+    end
 
 return Tile;
