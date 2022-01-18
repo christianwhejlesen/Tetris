@@ -10,8 +10,12 @@ local gameOver = false;
 local inert;
 local pieceStructures;
 local piece;
-local sequence;
+local width = 10;
+local height = 18;
+local cellSize = 20;
+
 --INITIALIZATION
+math.randomseed(os.time());
 
 --FUNCTIONS
 
@@ -45,13 +49,19 @@ function love.keyreleased( key )
                 piece.x = piece.x + 1;
             end
         end
+    else
+        if key == 'space' then
+            love.load();
+            gameOver = false;
+        end
     end
 
 end
 
 function love.load()
+    local offsetx = (love.graphics.getWidth() / 2) - ((width * cellSize) / 2);
     game.init();
-    inert = board.init(nil, nil, nil, 1, 2, 100, 50, nil);
+    inert = board.init(width, height, cellSize, 1, 2, offsetx, 50, nil);
     pieceStructures = tiles.init();
     love.graphics.setBackgroundColor(game.getbgColor());
     piece = tiles.newPiece();
@@ -59,7 +69,7 @@ end
 
 function love.update( dt )
     if not gameOver then
-        board.checkComplete();
+        game.updateScore( board.checkComplete() );
         if game.tick(dt) then
             if tiles.canTileMove(piece.type, piece.rotation, piece.x, piece.y + 1, board) then
                 piece.y = piece.y + 1;
@@ -75,7 +85,12 @@ function love.update( dt )
 end
 
 function love.draw()
+    local boardVars = board.getVars();
     board.draw(inert);
+    game.drawScore(boardVars);
+    tiles.drawNextTile(boardVars);
     tiles.drawTile(piece.type, piece.rotation, piece.x, piece.y, board);
-
+    if gameOver then
+        game.drawGameOver();
+    end
 end

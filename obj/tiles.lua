@@ -163,6 +163,9 @@ end
             for x = 1, 4 do
                 local xBlock = testX + x;
                 local yBlock = testY + y;
+                if yBlock < 1 then
+                    return false;
+                end
                 if tileset[piece][rotation][y][x] ~= ' ' and (xBlock < 1 or xBlock > brd.width or yBlock > brd.height or brd.field[yBlock][xBlock] ~= ' ') then
                     return false
                 end
@@ -186,11 +189,28 @@ end
         end
         local piece ={
             x = 3,
-            y = 0;
+            y = -1;
             type = table.remove(sequence),
             rotation = 1
         };
         return piece;
+    end
+
+    function Tile.drawNextTile(brdVars)
+        if #sequence == 0 then
+            newSequence();
+        end
+        local offsetX = brdVars.offsetX + (brdVars.width * brdVars.blockSize) + 50;
+        for y = 1, 4 do
+            for x = 1, 4 do
+                local block = tileset[sequence[#sequence]][1][y][x];
+                if block ~= ' ' then
+                    local color = brdVars.colors['preview']
+                    love.graphics.setColor(color)
+                    love.graphics.rectangle('fill', ((x - 1) * brdVars.blockSize) + offsetX, ((y - 1) * brdVars.blockSize) + brdVars.offsetY, brdVars.blockDrawSize, brdVars.blockDrawSize, brdVars.rounding, brdVars.rounding);
+                end
+            end
+        end
     end
 
 return Tile;

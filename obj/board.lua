@@ -21,6 +21,7 @@ Board = {}
         s = {212/255, 138/255, 237/255, 100/100},
         t = {247/255, 148/255, 196/255, 100/100},
         z = {168/255, 212/255, 117/255, 100/100},
+        preview = bgColor
     }
 
 --PUBLIC:
@@ -81,6 +82,7 @@ Board = {}
     end
 
     function Board.checkComplete()
+        local completeRows = 0;
         for y = 1, height do
             local complete = true;
             for x = 1, width do
@@ -90,6 +92,7 @@ Board = {}
                 end
             end
             if complete then
+                completeRows = completeRows + 1;
                 for removeY = y, 2, -1 do
                     for removeX = 1, width do
                         field[removeY][removeX] = field[removeY - 1][removeX];
@@ -100,6 +103,7 @@ Board = {}
                 end
             end
         end
+        return completeRows;
     end
 
 return Board;
