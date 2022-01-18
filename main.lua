@@ -19,32 +19,33 @@ local sequence;
 function love.keyreleased( key )
     if key == 'escape' then
         love.event.quit();
+    end
+    if not gameOver then
+        if key == 'up' then
+            local testRotation = piece.rotation + 1
+            if testRotation > #pieceStructures[piece.type] then
+                testRotation = 1
+            end
+            if tiles.canTileMove(piece.type, testRotation, piece.x, piece.y, board) then
+                piece.rotation = testRotation;
+            end
 
-    elseif key == 'up' then
-        local testRotation = piece.rotation + 1
-        if testRotation > #pieceStructures[piece.type] then
-            testRotation = 1
-        end
-        if tiles.canTileMove(piece.type, testRotation, piece.x, piece.y, board) then
-            piece.rotation = testRotation;
-        end
+        elseif key == 'down' then
+            while tiles.canTileMove(piece.type, piece.rotation, piece.x, piece.y + 1, board) do
+                piece.y = piece.y + 1
+            end
 
-    elseif key == 'down' then
-        while tiles.canTileMove(piece.type, piece.rotation, piece.x, piece.y + 1, board) do
-            piece.y = piece.y + 1
-        end
-
-    elseif key == 'left' then
-        if tiles.canTileMove(piece.type, piece.rotation, piece.x - 1, piece.y, board) then
-            piece.x = piece.x - 1;
-        end
-    
-    elseif key == 'right' then
-        if tiles.canTileMove(piece.type, piece.rotation, piece.x + 1, piece.y, board) then
-            piece.x = piece.x + 1;
+        elseif key == 'left' then
+            if tiles.canTileMove(piece.type, piece.rotation, piece.x - 1, piece.y, board) then
+                piece.x = piece.x - 1;
+            end
+        
+        elseif key == 'right' then
+            if tiles.canTileMove(piece.type, piece.rotation, piece.x + 1, piece.y, board) then
+                piece.x = piece.x + 1;
+            end
         end
     end
-
 
 end
 
@@ -57,16 +58,20 @@ function love.load()
 end
 
 function love.update( dt )
-    board.checkComplete();
-    if game.tick(dt) then
-        if tiles.canTileMove(piece.type, piece.rotation, piece.x, piece.y + 1, board) then
-            piece.y = piece.y + 1;
-        else
-            board.addToInert(piece, pieceStructures);
-            piece = tiles.newPiece();
+    if not gameOver then
+        board.checkComplete();
+        if game.tick(dt) then
+            if tiles.canTileMove(piece.type, piece.rotation, piece.x, piece.y + 1, board) then
+                piece.y = piece.y + 1;
+            else
+                board.addToInert(piece, pieceStructures);
+                piece = tiles.newPiece();
+                if not tiles.canTileMove(piece.type, piece.rotation, piece.x, piece.y + 1, board) then
+                    gameOver = true;
+                end
+            end
         end
     end
-    --inert[14][5] = 'z';
 end
 
 function love.draw()
